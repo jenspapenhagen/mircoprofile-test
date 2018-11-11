@@ -1,5 +1,7 @@
-# mircoprofile-test
-testing/playing around with microprofile javaEE 8.0
+# microprofile-test
+testing/playing around with microprofile with javaEE 8.0
+how big its get
+and checking for problems.
 
 
 # Build
