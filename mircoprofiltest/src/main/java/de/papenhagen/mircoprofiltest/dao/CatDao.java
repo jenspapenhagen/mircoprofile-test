@@ -6,43 +6,51 @@
 package de.papenhagen.mircoprofiltest.dao;
 
 import de.papenhagen.mircoprofiltest.entities.Cat;
-import java.util.List;
 import javax.ejb.Stateless;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 /**
  * Default test Dao
+ *
  * @author jay
  */
+@Named
 @Stateless
-public class CatDao {
+public class CatDao extends GenericDao<Cat> {
 
     @PersistenceContext(unitName = "mircotest-pu")
-    private EntityManager entityManager;
+    private EntityManager em;
 
-    public List<Cat> findAll() {
-        return entityManager.createNamedQuery("Cat.findAll", Cat.class).getResultList();
+    public CatDao() {
+        super(Cat.class);
+    }
+
+    public CatDao(EntityManager em) {
+        this();
+        this.em = em;
+    }
+
+    public EntityManager getEntityManager() {
+        return em;
     }
 
     public Cat findById(long id) {
-        return entityManager.find(Cat.class, id);
-    }
-    
-    public int count(){
-       return entityManager.createNamedQuery("Cat.findAll", Cat.class).getResultList().size();
+        return em.find(Cat.class, id);
     }
 
     public void save(Cat cat) {
-        entityManager.persist(cat);
+        em.persist(cat);
     }
 
     public void update(Cat cat) {
-        entityManager.merge(cat);
+        em.merge(cat);
     }
 
     public void delete(Cat cat) {
-        entityManager.remove(cat);
+        em.remove(cat);
     }
 
+ 
 }

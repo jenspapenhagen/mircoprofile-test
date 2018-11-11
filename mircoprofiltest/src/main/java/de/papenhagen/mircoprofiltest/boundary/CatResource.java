@@ -33,7 +33,8 @@ public class CatResource {
 
     @Inject
     private CatDao catDao;
-
+    
+    
     @GET
     public List<Cat> all() {
         return catDao.findAll();
