@@ -18,7 +18,7 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class CatDao {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "mircotest-pu")
     private EntityManager entityManager;
 
     public List<Cat> findAll() {
