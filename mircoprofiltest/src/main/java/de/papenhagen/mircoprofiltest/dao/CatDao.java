@@ -20,9 +20,6 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class CatDao extends GenericDao<Cat> {
 
-    @PersistenceContext(unitName = "mircotest-pu")
-    private EntityManager em;
-
     public CatDao() {
         super(Cat.class);
     }
@@ -30,14 +27,6 @@ public class CatDao extends GenericDao<Cat> {
     public CatDao(EntityManager em) {
         this();
         this.em = em;
-    }
-
-    public EntityManager getEntityManager() {
-        return em;
-    }
-
-    public Cat findById(long id) {
-        return em.find(Cat.class, id);
     }
 
     public void save(Cat cat) {

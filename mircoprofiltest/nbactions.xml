@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-clean Install Bundle</actionName>
+            <displayName>clean Install Bundle</displayName>
+            <goals>
+                <goal>clean</goal>
+                <goal>install</goal>
+                <goal>payara-micro:bundle</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-payara-micro start</actionName>
+            <displayName>payara-micro start</displayName>
+            <goals>
+                <goal>payara-micro:start</goal>
+            </goals>
+        </action>
+    </actions>

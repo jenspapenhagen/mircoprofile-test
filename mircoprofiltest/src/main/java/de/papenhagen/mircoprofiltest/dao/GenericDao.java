@@ -7,9 +7,9 @@ package de.papenhagen.mircoprofiltest.dao;
 
 import java.io.Serializable;
 import java.util.List;
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 /**
@@ -21,13 +21,17 @@ import javax.persistence.Query;
 @SuppressWarnings("serial")
 public class GenericDao<T> implements Serializable {
 
-    @Inject
+    @PersistenceContext(unitName = "mircotest-pu")
     protected EntityManager em;
 
     private Class<T> entityClass;
 
     public GenericDao(Class<T> entityClass) {
         this.entityClass = entityClass;
+    }
+    
+    public EntityManager getEntityManager() {
+        return em;
     }
 
     public T findById(Object id) {
@@ -46,13 +50,12 @@ public class GenericDao<T> implements Serializable {
 
     public List<T> findAll() {
         javax.persistence.criteria.CriteriaQuery<T> cq = em.getCriteriaBuilder().createQuery(entityClass);
-        cq.select(cq.from(entityClass));
+
         return em.createQuery(cq).getResultList();
     }
 
     public List<T> findAll(int start, int amount) {
         javax.persistence.criteria.CriteriaQuery<T> cq = em.getCriteriaBuilder().createQuery(entityClass);
-        cq.select(cq.from(entityClass));
         return em.createQuery(cq).setFirstResult(start).setMaxResults(amount).getResultList();
     }
 

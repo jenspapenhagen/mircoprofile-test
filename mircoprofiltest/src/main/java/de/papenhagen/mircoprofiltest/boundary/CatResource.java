@@ -7,9 +7,11 @@ package de.papenhagen.mircoprofiltest.boundary;
 
 import de.papenhagen.mircoprofiltest.dao.CatDao;
 import de.papenhagen.mircoprofiltest.entities.Cat;
-import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -33,29 +35,51 @@ public class CatResource {
 
     @Inject
     private CatDao catDao;
-    
-    
+
     @GET
-    public List<Cat> all() {
-        return catDao.findAll();
+    public JsonObject all() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+
+        catDao.findAll().stream().forEach(c -> {
+            builder.add("Id", c.getId());
+            builder.add("CatName", c.getName());
+        });
+
+        return builder.build();
     }
 
     @POST
-    public void save(Cat cat) {
+    public JsonObject save(Cat cat) {
         catDao.save(cat);
+
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("save", cat.getName());
+        return builder.build();
     }
 
     @PUT
     @Consumes("application/json")
-    public void update(Cat person) {
-        catDao.update(person);
+    public JsonObject update(Cat cat) {
+        catDao.update(cat);
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        builder.add("update", cat.getName());
+
+        return builder.build();
     }
 
     @DELETE
     @Path("/{id}")
-    public void delete(@PathParam("id") Long id) {
-        Cat person = catDao.findById(id);
-        catDao.delete(person);
+    public JsonObject delete(@PathParam("id") Long id) {
+          JsonObjectBuilder builder = Json.createObjectBuilder();
+        
+        Cat cat = catDao.findById(id);
+        if(cat != null){
+             catDao.delete(cat);
+             builder.add("delete", cat.getName());
+        }else{
+            builder.add("delete", "failed");
+        }
+       return builder.build();
     }
 
 }
