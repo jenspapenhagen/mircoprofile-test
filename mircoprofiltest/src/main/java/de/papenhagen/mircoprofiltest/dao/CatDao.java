@@ -6,22 +6,25 @@
 package de.papenhagen.mircoprofiltest.dao;
 
 import de.papenhagen.mircoprofiltest.entities.Cat;
+import de.papenhagen.mircoprofiltest.entities.QCat;
+import java.io.Serializable;
 import javax.ejb.Stateless;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 
 /**
  * Default test Dao
  *
- * @author jay
+ * @author jens.papenhagen
  */
 @Named
 @Stateless
-public class CatDao extends GenericDao<Cat> {
+@Transactional
+public class CatDao extends AbstractDAO<QCat, Cat> implements Serializable {
 
     public CatDao() {
-        super(Cat.class);
+        super();
     }
 
     public CatDao(EntityManager em) {
@@ -41,5 +44,4 @@ public class CatDao extends GenericDao<Cat> {
         em.remove(cat);
     }
 
- 
 }

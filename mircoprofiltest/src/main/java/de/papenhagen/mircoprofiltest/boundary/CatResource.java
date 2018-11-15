@@ -40,7 +40,7 @@ public class CatResource {
     public JsonObject all() {
         JsonObjectBuilder builder = Json.createObjectBuilder();
 
-        catDao.findAll().stream().forEach(c -> {
+        catDao.findAll(Cat.class).stream().forEach(c -> {
             builder.add("Id", c.getId());
             builder.add("CatName", c.getName());
         });
@@ -72,7 +72,7 @@ public class CatResource {
     public JsonObject delete(@PathParam("id") Long id) {
           JsonObjectBuilder builder = Json.createObjectBuilder();
         
-        Cat cat = catDao.findById(id);
+        Cat cat = catDao.findById(Cat.class, id);
         if(cat != null){
              catDao.delete(cat);
              builder.add("delete", cat.getName());
