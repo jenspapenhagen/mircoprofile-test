@@ -11,7 +11,7 @@ import javax.ws.rs.core.MediaType;
 
 /**
  *
- * @author jay
+ * @author jens.papenhagen
  */
 @Path("echo")
 @Produces(MediaType.APPLICATION_JSON)

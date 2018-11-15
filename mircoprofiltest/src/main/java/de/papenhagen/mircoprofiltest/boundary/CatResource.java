@@ -7,8 +7,9 @@ package de.papenhagen.mircoprofiltest.boundary;
 
 import de.papenhagen.mircoprofiltest.dao.CatDao;
 import de.papenhagen.mircoprofiltest.entities.Cat;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
+import de.papenhagen.mircoprofiltest.entities.QCat;
+import java.io.Serializable;
+import javax.enterprise.context.SessionScoped;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
@@ -25,18 +26,22 @@ import javax.ws.rs.core.MediaType;
 /**
  * CRUD REST API for Cat´s
  *
- * @author jay
+ * @author jens.papenhagen
  */
 @Path("cat")
-@Stateless
+@SessionScoped
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class CatResource {
+public class CatResource implements Serializable {
 
-    @Inject
     private CatDao catDao;
 
-    @GET
+    public CatResource() {
+        catDao = new CatDao(Cat.class, QCat.cat);
+    }
+
+    @GET()
+    @Path("/all")
     public JsonObject all() {
         JsonObjectBuilder builder = Json.createObjectBuilder();
 
@@ -49,6 +54,8 @@ public class CatResource {
     }
 
     @POST
+    @Path("/save")
+    @Consumes(MediaType.APPLICATION_JSON)
     public JsonObject save(Cat cat) {
         catDao.save(cat);
 
@@ -58,7 +65,8 @@ public class CatResource {
     }
 
     @PUT
-    @Consumes("application/json")
+    @Path("/update")
+    @Consumes(MediaType.APPLICATION_JSON)
     public JsonObject update(Cat cat) {
         catDao.update(cat);
         JsonObjectBuilder builder = Json.createObjectBuilder();
@@ -68,18 +76,18 @@ public class CatResource {
     }
 
     @DELETE
-    @Path("/{id}")
+    @Path("/delete/{id}")
     public JsonObject delete(@PathParam("id") Long id) {
-          JsonObjectBuilder builder = Json.createObjectBuilder();
-        
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+
         Cat cat = catDao.findById(Cat.class, id);
-        if(cat != null){
-             catDao.delete(cat);
-             builder.add("delete", cat.getName());
-        }else{
+        if (cat != null) {
+            catDao.delete(cat);
+            builder.add("delete", cat.getName());
+        } else {
             builder.add("delete", "failed");
         }
-       return builder.build();
+        return builder.build();
     }
 
 }

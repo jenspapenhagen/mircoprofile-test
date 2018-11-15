@@ -23,8 +23,13 @@ import javax.transaction.Transactional;
 @Transactional
 public class CatDao extends AbstractDAO<QCat, Cat> implements Serializable {
 
+    public CatDao(Class<Cat> entityClass, QCat qPath) {
+        super(entityClass, qPath);
+        this.em = getEntityManager();
+    }
+
     public CatDao() {
-        super();
+        super(Cat.class, QCat.cat);
     }
 
     public CatDao(EntityManager em) {

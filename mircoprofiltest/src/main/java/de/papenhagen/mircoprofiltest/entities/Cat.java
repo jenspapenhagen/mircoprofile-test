@@ -15,7 +15,7 @@ import javax.persistence.NamedQuery;
 
 /**
  *
- * @author jay
+ * @author jens.papenhagen
  */
 @Entity
 @NamedQueries({
@@ -73,10 +73,7 @@ public class Cat implements Serializable {
             return false;
         }
         final Cat other = (Cat) obj;
-        if (this.id != other.id) {
-            return false;
-        }
-        return true;
+        return this.id == other.id;
     }
 
     @Override
