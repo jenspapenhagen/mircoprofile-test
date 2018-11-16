@@ -12,6 +12,9 @@ import de.papenhagen.mircoprofiltest.entities.EagerAble;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -26,7 +29,8 @@ import javax.persistence.Query;
 @SuppressWarnings("serial")
 public abstract class AbstractDAO<Path extends EntityPath, T> implements Serializable {
 
-    protected abstract EntityManager getEntityManager();
+    @Inject
+    private EntityManager em;
 
     private Class<T> defineClass;
 
@@ -70,7 +74,7 @@ public abstract class AbstractDAO<Path extends EntityPath, T> implements Seriali
         if (id == null) {
             return null;
         }
-        return getEntityManager().find(entityClass, id);
+        return em.find(entityClass, id);
     }
 
     /**
@@ -102,7 +106,7 @@ public abstract class AbstractDAO<Path extends EntityPath, T> implements Seriali
         if (id == null) {
             return null;
         }
-        return getEntityManager().find(entityClass, id, lockModeType);
+        return em.find(entityClass, id, lockModeType);
     }
 
     /**
@@ -130,7 +134,7 @@ public abstract class AbstractDAO<Path extends EntityPath, T> implements Seriali
     public <T> List<T> findAll(Class<T> entityClass) {
         validate(entityClass);
 
-        JPAQuery query = new JPAQuery(getEntityManager());
+        JPAQuery query = new JPAQuery(em);
         return query.from(qPath).fetch();
     }
 
@@ -160,7 +164,7 @@ public abstract class AbstractDAO<Path extends EntityPath, T> implements Seriali
     public <T> List<T> findAll(Class<T> entityClass, int start, int amount) {
         validate(entityClass);
 
-        JPAQuery query = new JPAQuery(getEntityManager());
+        JPAQuery query = new JPAQuery(em);
         return query.from(qPath).fetch().subList(start, amount);
     }
 
@@ -187,7 +191,7 @@ public abstract class AbstractDAO<Path extends EntityPath, T> implements Seriali
 
     private void validate(Class<?> clazz) {
         Objects.requireNonNull(clazz, "Supplied entityClass is null");
-        Objects.requireNonNull(getEntityManager(), "Supplied EntityManager is null");
+        Objects.requireNonNull(em, "Supplied EntityManager is null");
     }
 
     private <T> T optionalFetchEager(T entity) {
@@ -218,26 +222,26 @@ public abstract class AbstractDAO<Path extends EntityPath, T> implements Seriali
     }
 
     public void remove(Object entity) {
-        getEntityManager().remove(entity);
+        em.remove(entity);
     }
 
     public void flush() {
-        getEntityManager().flush();
+        em.flush();
     }
 
     public void clear() {
-        getEntityManager().clear();
+        em.clear();
     }
 
     public <T> List<T> nativeSqlQuery(String sqlQuery, Class<T> clazz) {
-        Query query = getEntityManager().createNativeQuery(sqlQuery, clazz);
+        Query query = em.createNativeQuery(sqlQuery, clazz);
         @SuppressWarnings("unchecked")
         List<T> resultList = query.getResultList();
         return resultList;
     }
 
     public List<?> nativeSqlQuery(String sqlQuery) {
-        Query query = getEntityManager().createNativeQuery(sqlQuery);
+        Query query = em.createNativeQuery(sqlQuery);
         return query.getResultList();
     }
 }

@@ -8,11 +8,9 @@ package de.papenhagen.mircoprofiltest.dao;
 import de.papenhagen.mircoprofiltest.entities.Cat;
 import de.papenhagen.mircoprofiltest.entities.QCat;
 import java.io.Serializable;
-import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
 
 /**
  * Default test Dao
@@ -20,11 +18,9 @@ import javax.transaction.Transactional;
  * @author jens.papenhagen
  */
 @Named
-@Stateless
-@Transactional
 public class CatDao extends AbstractDAO<QCat, Cat> implements Serializable {
 
-    @PersistenceContext(unitName = "mircotestpu")
+    @Inject
     private EntityManager em;
 
     public CatDao(Class<Cat> entityClass, QCat qPath) {
@@ -52,9 +48,5 @@ public class CatDao extends AbstractDAO<QCat, Cat> implements Serializable {
         em.remove(cat);
     }
 
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
-    }
 
 }
