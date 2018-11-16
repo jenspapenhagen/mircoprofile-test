@@ -8,6 +8,7 @@ package de.papenhagen.mircoprofiltest.dao;
 import de.papenhagen.mircoprofiltest.entities.Cat;
 import de.papenhagen.mircoprofiltest.entities.QCat;
 import java.io.Serializable;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -17,6 +18,7 @@ import javax.persistence.EntityManager;
  *
  * @author jens.papenhagen
  */
+@ApplicationScoped
 @Named
 public class CatDao extends AbstractDAO<QCat, Cat> implements Serializable {
 
