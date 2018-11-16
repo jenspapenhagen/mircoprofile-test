@@ -11,6 +11,7 @@ import java.io.Serializable;
 import javax.ejb.Stateless;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 /**
@@ -23,9 +24,11 @@ import javax.transaction.Transactional;
 @Transactional
 public class CatDao extends AbstractDAO<QCat, Cat> implements Serializable {
 
+    @PersistenceContext(unitName = "mircotestpu")
+    private EntityManager em;
+
     public CatDao(Class<Cat> entityClass, QCat qPath) {
         super(entityClass, qPath);
-        this.em = getEntityManager();
     }
 
     public CatDao() {
@@ -47,6 +50,11 @@ public class CatDao extends AbstractDAO<QCat, Cat> implements Serializable {
 
     public void delete(Cat cat) {
         em.remove(cat);
+    }
+
+    @Override
+    protected EntityManager getEntityManager() {
+        return em;
     }
 
 }
