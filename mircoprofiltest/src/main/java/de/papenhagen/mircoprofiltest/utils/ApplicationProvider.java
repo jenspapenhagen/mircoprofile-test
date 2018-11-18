@@ -12,5 +12,5 @@ public class ApplicationProvider {
 
     @Produces
     @PersistenceContext(unitName = "mircotestpu")
-    EntityManager em;
+    private EntityManager em;
 }

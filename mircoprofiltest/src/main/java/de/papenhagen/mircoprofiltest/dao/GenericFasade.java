@@ -10,9 +10,12 @@ import com.querydsl.jpa.impl.JPAQuery;
 import de.papenhagen.mircoprofiltest.entities.EagerAble;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import javax.enterprise.context.ApplicationScoped;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -26,9 +29,19 @@ import javax.persistence.Query;
  *
  * @author jens.papenhagen
  */
+@Singleton()
+@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
+@Named("genericDao")
 @SuppressWarnings("serial")
-public abstract class AbstractDAO<Path extends EntityPath, T> implements Serializable {
+public class GenericFasade<Path extends EntityPath, T> implements Serializable {
 
+    private static final int BULK_INSERT_BATCH_SIZE = 50;
+
+    /**
+     * "[...] The biggest benefit of using Transaction Scoped Entity Manager is
+     * that it is stateless. This also makes the Transaction Scoped
+     * EntityManager threadsafe and thus virtually maintenance free. [...]"
+     */
     @Inject
     private EntityManager em;
 
@@ -36,7 +49,6 @@ public abstract class AbstractDAO<Path extends EntityPath, T> implements Seriali
 
     protected Path qPath;
 
-   
     public Class<T> getDefineClass() {
         return defineClass;
     }
@@ -53,12 +65,12 @@ public abstract class AbstractDAO<Path extends EntityPath, T> implements Seriali
         this.defineClass = defineClass;
     }
 
-    public AbstractDAO(Class<T> entityClass, Path qPath) {
+    public GenericFasade(Class<T> entityClass, Path qPath) {
         this.defineClass = entityClass;
         this.qPath = qPath;
     }
 
-    public AbstractDAO() {
+    public GenericFasade() {
     }
 
     /**
@@ -189,11 +201,95 @@ public abstract class AbstractDAO<Path extends EntityPath, T> implements Seriali
         return Long.valueOf(findAll(entityClass).size());
     }
 
-    private void validate(Class<?> clazz) {
-        Objects.requireNonNull(clazz, "Supplied entityClass is null");
-        Objects.requireNonNull(em, "Supplied EntityManager is null");
+    /**
+     * remove a entity by checckign the db befor
+     *
+     * @param entityClass
+     * @param id
+     * @return true for removing and false on enity not found
+     */
+    public boolean remove(Class<T> entityClass, Object id) {
+        T findById = findById(entityClass, id);
+        if (findById != null) {
+            remove(findById);
+            return true;
+        }
+        return false;
     }
 
+    /**
+     * persist a enity
+     *
+     * @param entity
+     */
+    public void persist(T entity) {
+        em.persist(entity);
+    }
+
+    /**
+     * merge a entity back to db
+     *
+     * @param entity
+     * @return the merged entity
+     */
+    public Object merge(T entity) {
+        return em.merge(entity);
+    }
+
+    /**
+     * persist many entities on Bulk with a small delay for the db to handel
+     * this work load
+     *
+     * @param entities
+     */
+    public void persistBulk(Collection<T> entities) {
+        int i = 0;
+        for (T entity : entities) {
+            persist(entity);
+            if (++i % BULK_INSERT_BATCH_SIZE == 0) {
+                flush();
+                clear();
+            }
+        }
+        flush();
+        clear();
+    }
+
+    /**
+     * this is a wrapper methode for creating a Native Query for a given class
+     * !WARNING! Handle with care
+     *
+     * @param <T>
+     * @param sqlQuery
+     * @param clazz the given class
+     * @return a resultList of Enititys for the given class
+     */
+    public <T> List<T> nativeSqlQuery(String sqlQuery, Class<T> clazz) {
+        Query query = em.createNativeQuery(sqlQuery, clazz);
+        @SuppressWarnings("unchecked")
+        List<T> resultList = query.getResultList();
+        return resultList;
+    }
+
+    /**
+     * this is a wrapper methode for creating a Native Query !WARNING! Handle
+     * with care
+     *
+     * @param sqlQuery
+     * @return a resultList
+     */
+    public List<?> nativeSqlQuery(String sqlQuery) {
+        Query query = em.createNativeQuery(sqlQuery);
+        return query.getResultList();
+    }
+
+    /**
+     * this methode is loading a given entity eagar
+     *
+     * @param <T>
+     * @param entity
+     * @return an entity loaded eagar
+     */
     private <T> T optionalFetchEager(T entity) {
         if (entity == null) {
             return null;
@@ -205,6 +301,13 @@ public abstract class AbstractDAO<Path extends EntityPath, T> implements Seriali
         return entity;
     }
 
+    /**
+     * Loading a list of entities all eager
+     *
+     * @param <T> List of entries
+     * @param entities
+     * @return the List of entries but eager loaded
+     */
     private <T> List<T> optionalFetchEager(List<T> entities) {
         if (entities == null) {
             return null;
@@ -221,27 +324,37 @@ public abstract class AbstractDAO<Path extends EntityPath, T> implements Seriali
         return entities;
     }
 
-    public void remove(Object entity) {
+    /**
+     * fast validation of a given Class
+     *
+     * @param clazz
+     */
+    private void validate(Class<?> clazz) {
+        Objects.requireNonNull(clazz, "Supplied entityClass is null");
+        Objects.requireNonNull(em, "Supplied EntityManager is null");
+    }
+
+    /**
+     * remove a entity
+     *
+     * @param entity
+     */
+    private void remove(T entity) {
         em.remove(entity);
     }
 
-    public void flush() {
+    /**
+     * flush the em
+     */
+    private void flush() {
         em.flush();
     }
 
-    public void clear() {
+    /**
+     * clear the em
+     */
+    private void clear() {
         em.clear();
     }
 
-    public <T> List<T> nativeSqlQuery(String sqlQuery, Class<T> clazz) {
-        Query query = em.createNativeQuery(sqlQuery, clazz);
-        @SuppressWarnings("unchecked")
-        List<T> resultList = query.getResultList();
-        return resultList;
-    }
-
-    public List<?> nativeSqlQuery(String sqlQuery) {
-        Query query = em.createNativeQuery(sqlQuery);
-        return query.getResultList();
-    }
 }

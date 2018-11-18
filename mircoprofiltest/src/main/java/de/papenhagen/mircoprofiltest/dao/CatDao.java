@@ -20,7 +20,7 @@ import javax.persistence.EntityManager;
  */
 @ApplicationScoped
 @Named
-public class CatDao extends AbstractDAO<QCat, Cat> implements Serializable {
+public class CatDao extends GenericFasade<QCat, Cat> implements Serializable {
 
     @Inject
     private EntityManager em;
