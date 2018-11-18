@@ -5,7 +5,7 @@
  */
 package de.papenhagen.mircoprofiltest.boundary;
 
-import de.papenhagen.mircoprofiltest.dao.CatDao;
+import de.papenhagen.mircoprofiltest.fasade.CatFasade;
 import de.papenhagen.mircoprofiltest.entities.Cat;
 import de.papenhagen.mircoprofiltest.entities.QCat;
 import java.io.Serializable;
@@ -34,10 +34,10 @@ import javax.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 public class CatResource implements Serializable {
 
-    private CatDao catDao;
+    private CatFasade catDao;
 
     public CatResource() {
-        catDao = new CatDao(Cat.class, QCat.cat);
+        catDao = new CatFasade(Cat.class, QCat.cat);
     }
 
     @GET()

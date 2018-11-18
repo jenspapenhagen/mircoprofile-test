@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.papenhagen.mircoprofiltest.dao;
+package de.papenhagen.mircoprofiltest.fasade;
 
 import de.papenhagen.mircoprofiltest.entities.Cat;
 import de.papenhagen.mircoprofiltest.entities.QCat;
@@ -14,26 +14,26 @@ import javax.inject.Named;
 import javax.persistence.EntityManager;
 
 /**
- * Default test Dao
+ * Default test Fasade
  *
  * @author jens.papenhagen
  */
-@ApplicationScoped
 @Named
-public class CatDao extends GenericFasade<QCat, Cat> implements Serializable {
+@ApplicationScoped
+public class CatFasade extends GenericFasade<QCat, Cat> implements Serializable {
 
     @Inject
     private EntityManager em;
 
-    public CatDao(Class<Cat> entityClass, QCat qPath) {
+    public CatFasade(Class<Cat> entityClass, QCat qPath) {
         super(entityClass, qPath);
     }
 
-    public CatDao() {
+    public CatFasade() {
         super(Cat.class, QCat.cat);
     }
 
-    public CatDao(EntityManager em) {
+    public CatFasade(EntityManager em) {
         this();
         this.em = em;
     }

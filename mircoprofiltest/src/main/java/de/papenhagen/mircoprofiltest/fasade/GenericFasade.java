@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.papenhagen.mircoprofiltest.dao;
+package de.papenhagen.mircoprofiltest.fasade;
 
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -16,11 +16,13 @@ import java.util.Objects;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 /**
@@ -29,9 +31,10 @@ import javax.persistence.Query;
  *
  * @author jens.papenhagen
  */
-@Singleton()
+
+@Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
-@Named("genericDao")
+@Named("genericFasade")
 @SuppressWarnings("serial")
 public class GenericFasade<Path extends EntityPath, T> implements Serializable {
 
@@ -43,6 +46,7 @@ public class GenericFasade<Path extends EntityPath, T> implements Serializable {
      * EntityManager threadsafe and thus virtually maintenance free. [...]"
      */
     @Inject
+    @PersistenceContext(unitName = "mircotestpu")
     private EntityManager em;
 
     private Class<T> defineClass;
@@ -63,6 +67,11 @@ public class GenericFasade<Path extends EntityPath, T> implements Serializable {
 
     public void setDefineClass(Class<T> defineClass) {
         this.defineClass = defineClass;
+    }
+
+    @Produces
+    public EntityManager getEntityManager() {
+        return em;
     }
 
     public GenericFasade(Class<T> entityClass, Path qPath) {
