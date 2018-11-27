@@ -10,6 +10,7 @@ import de.papenhagen.mircoprofiltest.entities.Cat;
 import de.papenhagen.mircoprofiltest.entities.QCat;
 import java.io.Serializable;
 import javax.enterprise.context.SessionScoped;
+import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;

@@ -16,8 +16,8 @@ import javax.ws.rs.core.MediaType;
 @Path("echo")
 @Produces(MediaType.APPLICATION_JSON)
 public class EchoResource {
-    
-     @GET
+
+    @GET
     @Path("/{echo}")
     public JsonObject echo(@PathParam("echo") String param) {
         JsonObjectBuilder builder = Json.createObjectBuilder();
@@ -25,6 +25,5 @@ public class EchoResource {
 
         return builder.build();
     }
-    
-    
+
 }
